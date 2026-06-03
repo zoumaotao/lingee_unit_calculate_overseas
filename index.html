@@ -313,33 +313,33 @@ const GITHUB_CONFIG = {
 
 const structuredScenes = [
     { isHeader: true, name: "【对话板块】通用日常对话、联网搜索与多模态交互" },
-    { name: "日常通用 Chat（多轮对话、联网搜索与引导式追问）", standard: 3, complex: 35, desc: "依据：全员碎片化通用日常问答、行业大背景联网信息召回等日常基础高频需求。", freq: { finance_heavy: 120, trade_heavy: 150, tech_office: 300 } },
-    { name: "多模态多格式文档智能解析与资产沉淀", standard: 15, complex: 50, desc: "依据：日常对长 Word、Excel 账表、PDF、商务图片提取或生成汇报 PPT 大纲的频次。", freq: { finance_heavy: 30, trade_heavy: 50, tech_office: 80 } },
+    { name: "日常通用 Chat（多轮对话、联网搜索与引导式追问）", standard: 12, complex: 140, desc: "依据：全员碎片化通用日常问答、行业大背景联网信息召回等日常基础高频需求。", freq: { finance_heavy: 120, trade_heavy: 150, tech_office: 300 } },
+    { name: "多模态多格式文档智能解析与资产沉淀", standard: 60, complex: 200, desc: "依据：日常对长 Word、Excel 账表、PDF、商务图片提取或生成汇报 PPT 大纲的频次。", freq: { finance_heavy: 30, trade_heavy: 50, tech_office: 80 } },
 
     { isHeader: true, name: "【工作板块】AI 财务类智能体（高频、强刚需、高并发）" },
-    { name: "财务类 - 记账专员（智能记账与凭证自动生成）", standard: 100, complex: 210, desc: "依据：按该规模企业月均1200张原始凭证中，由 AI 财务管线自动化转换及核销 25% 倒推。", freq: { finance_heavy: 300, trade_heavy: 50, tech_office: 20 } },
-    { name: "财务类 - 费用与采购付款自动审核专员", standard: 200, complex: 317.47, desc: "依据：对齐日常月度全员对公付款与费用单据。AI 独立执行20%业务量的自动化合规查重初审。", freq: { finance_heavy: 120, trade_heavy: 40, tech_office: 15 } },
-    { name: "财务类 - 银企/往来/集团内部对账专员", standard: 180, complex: 300, desc: "依据：支持多账套银行电子流水、多系统往来账目周期性自动化核对及挂账账龄分析。", freq: { finance_heavy: 40, trade_heavy: 20, tech_office: 5 } },
-    { name: "财务类 - 结账专员（期末关账与异常多表核对）", standard: 160, complex: 1000, desc: "依据：主副账套期末各执行 1-2 次/月。处理重度大文件多表跨管线关联，建议防爆舱测算。", freq: { finance_heavy: 2, trade_heavy: 1, tech_office: 1 } },
-    { name: "财务类 - 成本核算专员（折旧变动与物料结转）", standard: 160, complex: 200, desc: "依据：每月固定资产折旧计提、存货大宗物料成本结转与产线异常损耗分析频次。", freq: { finance_heavy: 15, trade_heavy: 2, tech_office: 0 } },
+    { name: "财务类 - 记账专员（智能记账与凭证自动生成）", standard: 400, complex: 840, desc: "依据：按该规模企业月均1200张原始凭证中，由 AI 财务管线自动化转换及核销 25% 倒推。", freq: { finance_heavy: 300, trade_heavy: 50, tech_office: 20 } },
+    { name: "财务类 - 费用与采购付款自动审核专员", standard: 800, complex: 1269.88, desc: "依据：对齐日常月度全员对公付款与费用单据。AI 独立执行20%业务量的自动化合规查重初审。", freq: { finance_heavy: 120, trade_heavy: 40, tech_office: 15 } },
+    { name: "财务类 - 银企/往来/集团内部对账专员", standard: 720, complex: 1200, desc: "依据：支持多账套银行电子流水、多系统往来账目周期性自动化核对及挂账账龄分析。", freq: { finance_heavy: 40, trade_heavy: 20, tech_office: 5 } },
+    { name: "财务类 - 结账专员（期末关账与异常多表核对）", standard: 640, complex: 4000, desc: "依据：主副账套期末各执行 1-2 次/月。处理重度大文件多表跨管线关联，建议防爆舱测算。", freq: { finance_heavy: 2, trade_heavy: 1, tech_office: 1 } },
+    { name: "财务类 - 成本核算专员（折旧变动与物料结转）", standard: 640, complex: 800, desc: "依据：每月固定资产折旧计提、存货大宗物料成本结转与产线异常损耗分析频次。", freq: { finance_heavy: 15, trade_heavy: 2, tech_office: 0 } },
 
     { isHeader: true, name: "【工作板块】AI 供应链类智能体（多方协同、比价风控）" },
-    { name: "供应链类 - 询价专员（供应商询价定标与比价助手）", standard: 20, complex: 60, desc: "依据：按企业日均 5-6 批次的多品类、多标准多准则客商比价单及招投标标书查重判定倒推。", freq: { finance_heavy: 20, trade_heavy: 150, tech_office: 2 } },
-    { name: "供应链类 - 商城采购专员", standard: 50, complex: 90, desc: "依据：对接内部或大宗外部工业品采购平台，批量进行采购申请提取及自动跟催异常交付。", freq: { finance_heavy: 35, trade_heavy: 80, tech_office: 10 } },
+    { name: "供应链类 - 询价专员（供应商询价定标与比价助手）", standard: 80, complex: 240, desc: "依据：按企业日均 5-6 批次的多品类、多标准多准则客商比价单及招投标标书查重判定倒推。", freq: { finance_heavy: 20, trade_heavy: 150, tech_office: 2 } },
+    { name: "供应链类 - 商城采购专员", standard: 200, complex: 360, desc: "依据：对接内部或大宗外部工业品采购平台，批量进行采购申请提取及自动跟催异常交付。", freq: { finance_heavy: 35, trade_heavy: 80, tech_office: 10 } },
 
     { isHeader: true, name: "【工作板块】AI 法务类智能体（重度长文本、条款博弈）" },
-    { name: "法务类 - 合同审查专员（多语言标准合同风控合规审查）", standard: 100, complex: 150, desc: "依据：针对销售、采购、海外物流及双语清关等框架协议进行长文本第一道法务合规强审频次。", freq: { finance_heavy: 15, trade_heavy: 60, tech_office: 10 } },
-    { name: "法务类 - 法务培训助手（合同商务谈判条款博弈与文本起草）", standard: 15, complex: 80, desc: "依据：围绕大额核心纠纷或高风险条款进行模拟对抗博弈、多轮改写对齐与内部答疑生成频次。", freq: { finance_heavy: 8, trade_heavy: 30, tech_office: 5 } },
+    { name: "法务类 - 合同审查专员（多语言标准合同风控合规审查）", standard: 400, complex: 600, desc: "依据：针对销售、采购、海外物流及双语清关等框架协议进行长文本第一道法务合规强审频次。", freq: { finance_heavy: 15, trade_heavy: 60, tech_office: 10 } },
+    { name: "法务类 - 法务培训助手（合同商务谈判条款博弈与文本起草）", standard: 60, complex: 320, desc: "依据：围绕大额核心纠纷或高风险条款进行模拟对抗博弈、多轮改写对齐与内部答疑生成频次。", freq: { finance_heavy: 8, trade_heavy: 30, tech_office: 5 } },
 
     { isHeader: true, name: "【工作板块】AI 高管类智能体（决策追问、指令下发）" },
-    { name: "高管类 - 高管日常经营多轮追问及指令下发", standard: 10, complex: 100, desc: "依据：满足核心管理层与核心高管，日常通过语音或自然语言追问、生成全局调度指令的频次。", freq: { finance_heavy: 40, trade_heavy: 60, tech_office: 100 } },
+    { name: "高管类 - 高管日常经营多轮追问及指令下发", standard: 40, complex: 400, desc: "依据：满足核心管理层与核心高管，日常通过语音或自然语言追问、生成全局调度指令的频次。", freq: { finance_heavy: 40, trade_heavy: 60, tech_office: 100 } },
 
     { isHeader: true, name: "【工作板块】AI 分析类智能体（跨模块召回、多维财务看板）" },
-    { name: "分析类 - 经营分析智能体", standard: 160, complex: 500, desc: "融合 ERP 财务数据与 Excel 报表等多源数据，从海量数据中精准定位异常、逐层穿透归因，将繁杂数据转化为清晰决策依据，一键生成深度的可视化分析报告。", freq: { finance_heavy: 10, trade_heavy: 14, tech_office: 4 } },
+    { name: "分析类 - 经营分析智能体", standard: 640, complex: 2000, desc: "融合 ERP 财务数据与 Excel 报表等多源数据，从海量数据中精准定位异常、逐层穿透归因，将繁杂数据转化为清晰决策依据，一键生成深度的可视化分析报告。", freq: { finance_heavy: 10, trade_heavy: 14, tech_office: 4 } },
 
     { isHeader: true, name: "【开发板块】技能、智能体与苍穹应用自建" },
-    { name: "创建1个技能", standard: 5, complex: 50, desc: "如：创建BOM维护查询技能、创建查询定额汇总信息技能、创建工作流任务操作技能、创建定额查询税务管理技能、创建报价单审核技能……", freq: { finance_heavy: 20, trade_heavy: 30, tech_office: 60 } },
-    { name: "创建1个智能体", standard: 5, complex: 50, desc: "如：智能体-创建一个人事管理专员包含所有人事相关技能、智能体-创建一个智能体包含WBS批量操作技能、智能体-创建一个报销智能体专家包含定额查询税务管理技能……", freq: { finance_heavy: 4, trade_heavy: 6, tech_office: 15 } }
+    { name: "创建1个技能", standard: 20, complex: 200, desc: "如：创建BOM维护查询技能、创建查询定额汇总信息技能、创建工作流任务操作技能、创建定额查询税务管理技能、创建报价单审核技能……", freq: { finance_heavy: 20, trade_heavy: 30, tech_office: 60 } },
+    { name: "创建1个智能体", standard: 20, complex: 200, desc: "如：智能体-创建一个人事管理专员包含所有人事相关技能、智能体-创建一个智能体包含WBS批量操作技能、智能体-创建一个报销智能体专家包含定额查询税务管理技能……", freq: { finance_heavy: 4, trade_heavy: 6, tech_office: 15 } }
 ];
 
 // 动态渲染表格
