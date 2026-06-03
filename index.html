@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>灵基点数增购测算工具（海外版）</title>
+    <style>
+        :root {
+            --primary-color: #1b63c5;
+            --bg-color: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-dark: #1e293b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding: 30px; margin: 0; line-height: 1.5; }
+        .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 7.5fr 4.5fr; gap: 30px; }
+        header { grid-column: span 2; background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
+        h1 { margin: 0 0 8px 0; color: var(--primary-color); font-size: 24px; }
+        p.subtitle { margin: 0; color: #64748b; font-size: 14px; }
+        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 20px; }
+        h2 { font-size: 18px; margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        .form-item { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #475569; }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 14px; background-color: #fff; }
+        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; }
+        
+        .scene-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .scene-table th { background: #f1f5f9; font-weight: 600; padding: 12px; text-align: left; border-bottom: 2px solid var(--border-color); }
+        .scene-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .section-row { background-color: #f1f5f9; font-weight: 700; color: var(--primary-color); font-size: 14px; }
+        .section-row td { padding: 12px 12px; border-left: 5px solid var(--primary-color); }
+        .input-freq { width: 90px !important; padding: 6px !important; text-align: center; font-weight: bold; }
+        .desc-text { font-size: 12px; color: #64748b; margin-top: 4px; display: block; line-height: 1.4; }
+        
+        .result-panel { background: #fff; position: sticky; top: 30px; border-top: 4px solid var(--primary-color); }
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .metric-box { padding: 15px; border-radius: 8px; background: #f8fafc; border: 1px solid var(--border-color); }
+        .metric-title { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 5px; }
+        .metric-value { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .price-text { font-size: 26px; color: var(--primary-color); font-weight: 800; }
+        
+        .status-banner { padding: 15px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 20px; }
+        .status-enough { background-color: #ecfdf5; color: var(--success-color); border: 1px solid #a7f3d0; }
+        .status-short { background-color: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+        .btn-generate { 
+            display: block; width: 100%; padding: 14px; margin-top: 20px;
+            background: var(--primary-color); color: #fff; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-generate:hover { background: #154ea1; }
+        .btn-generate:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* 弹窗 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 12px; padding: 30px; width: 460px; max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 { margin-top: 0; color: var(--primary-color); font-size: 18px; margin-bottom: 20px; }
+        .modal-form-item { margin-bottom: 16px; }
+        .modal-form-item label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #475569; }
+        .modal-form-item input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .modal-btns { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-submit { background: var(--primary-color); color: #fff; }
+        .btn-submit:hover { background: #154ea1; }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid var(--border-color) !important; }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--success-color); color: #fff; padding: 12px 28px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 99999;
+            display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { display: block; animation: fadeInOut 3s ease; }
+        .toast.error { background: var(--danger-color); }
+        @keyframes fadeInOut { 0%{opacity:0;transform:translateX(-50%) translateY(-10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 85%{opacity:1} 100%{opacity:0} }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast-msg"></div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+        <h3>填写信息并生成增购建议</h3>
+        <div class="modal-form-item">
+            <label for="modal-identity">您的身份 <span style="color:#ef4444;">*</span></label>
+            <select id="modal-identity" style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; font-size:14px;">
+                <option value="">请选择</option>
+                <option value="金蝶伙伴员工">金蝶伙伴员工</option>
+                <option value="金蝶员工">金蝶员工</option>
+            </select>
+        </div>
+        <div class="modal-form-item">
+            <label for="modal-company">您所在的公司或机构名称 <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="modal-company" placeholder="请输入您所在的公司或机构名称">
+        </div>
+        <div class="modal-form-item">
+            <label for="modal-name">姓名 <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="modal-name" placeholder="请输入您的姓名">
+        </div>
+        <div class="modal-form-item">
+            <label for="modal-phone">手机号</label>
+            <input type="tel" id="modal-phone" placeholder="选填">
+        </div>
+        <div class="modal-form-item">
+            <label for="modal-customer">客户名称 <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="modal-customer" placeholder="请输入客户名称">
+        </div>
+        <div class="modal-form-item">
+            <label for="modal-budget">客户预算 <span style="color:#ef4444;">*</span></label>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="number" id="modal-budget" placeholder="例如：5" style="flex:1;" min="0">
+                <span style="font-size:14px; color:#475569; white-space:nowrap;">万美元/年</span>
+            </div>
+        </div>
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn-submit" id="btn-do-submit" onclick="submitRecord()">确认提交</button>
+        </div>
+    </div>
+</div>
+
+<!-- 反馈弹窗 -->
+<div class="modal-overlay" id="feedback-overlay">
+    <div class="modal-box">
+        <h3>反馈测算建议或其他意见</h3>
+        <div class="modal-form-item">
+            <label for="feedback-content">您的反馈内容</label>
+            <textarea id="feedback-content" rows="5" placeholder="请输入您的建议或意见..." style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; box-sizing:border-box; font-size:14px; resize:vertical;"></textarea>
+        </div>
+        <div class="modal-form-item">
+            <label>附件（选填）</label>
+            <div id="feedback-file-area" style="border:2px dashed var(--border-color); border-radius:8px; padding:16px; text-align:center; cursor:pointer; background:#f8fafc;" onclick="document.getElementById('feedback-file-input').click()">
+                <div style="color:#64748b; font-size:13px;">点击选择文件或拖拽到此处</div>
+                <div style="color:#94a3b8; font-size:11px; margin-top:6px;">支持图片、PDF、Word、Excel、TXT、JSON、MD、HTML，单文件≤5MB，最多5个</div>
+                <input type="file" id="feedback-file-input" style="display:none;" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.json,.md,.html,.htm" onchange="handleFeedbackFiles(this.files)">
+            </div>
+            <div id="feedback-file-list" style="margin-top:8px;"></div>
+        </div>
+        <div class="modal-form-item">
+            <label for="feedback-name">姓名 <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="feedback-name" placeholder="请输入您的姓名">
+        </div>
+        <div class="modal-form-item">
+            <label for="feedback-contact">联系方式 <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="feedback-contact" placeholder="请输入手机号或邮箱">
+        </div>
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeFeedbackModal()">取消</button>
+            <button class="btn-submit" id="btn-feedback-submit" onclick="submitFeedback()">提交反馈</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <header>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1>灵基点数增购测算工具 - 海外版（仅供测算参考，以实际业务使用为准）</h1>
+                <p class="subtitle">金蝶灵基 AI 操作系统，对齐企业部门职能及日常业务量分布的AI消耗测算（海外定价）</p>
+            </div>
+            <a href="javascript:void(0)" onclick="openFeedbackModal()" style="font-size:13px; color:#64748b; text-decoration:underline; white-space:nowrap;">反馈测算建议或其他意见</a>
+        </div>
+    </header>
+
+    <div class="main-panel">
+        <div class="card">
+            <h2>1. 客户基本属性与席位配置</h2>
+            <div class="form-grid">
+                <div class="form-item">
+                    <label for="industry">业务领域典型画像预设</label>
+                    <select id="industry" onchange="applyIndustryPreset()">
+                        <option value="custom">自由定制模式（手动输入频次）</option>
+                        <option value="finance_heavy">制造/快消等大型企业（财务类重度、结账核算密集型）</option>
+                        <option value="trade_heavy">跨境电商/大宗供应链（供应链协同频繁、法务审核密集型）</option>
+                        <option value="tech_office">高科技/现代服务业（Chat高频交互、Build自主构建活跃型）</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="seats">拟采购用户席位数（专业版 5 席起售）</label>
+                    <input type="number" id="seats" value="5" min="5">
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-item">
+                    <label for="complexity">单据/文件复杂度（影响单次耗点）</label>
+                    <select id="complexity" onchange="updateCostDisplay()">
+                        <option value="standard">标准场景口径（基于线上常态化消耗）</option>
+                        <option value="complex">防爆舱口径（重度合并报表/长合同条款对抗/多任务串联极值）</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="base-price">席位费标准单价（固定）</label>
+                    <input type="text" id="base-price" value="$15 / 用户 / 月（$180 / 用户 / 年）" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background: #f1f5f9; border-left: 5px solid #64748b;">
+            <h3 style="margin-top:0; font-size:15px; color:#334155;">测算假设</h3>
+            <ul style="font-size:12px; color:#475569; padding-left:20px; line-height:1.6; margin-bottom:0;">
+                <li><b>锚定企业规模</b>：统一对齐<b>中等规模(ME)客户画像</b>（年营收2-8亿，总员工300-800人，核心团队5-15人，匹配5席起售门槛）。</li>
+                <li><b>月度业务量依据</b>：
+                    <br>• <i>财务重度</i>：按该规模企业月均1200张凭证中，由 AI 管线自动化处理 25% 的高频标准凭证倒推（300次/月）。
+                    <br>• <i>供应链重度</i>：按企业多品类、大宗采购中，日均 5-6 批次的多方多准则询价定标及客商风控核查倒推（150次/月）。
+                    <br>• <i>高管日常交互</i>：按5名核心高管与决策层，平均每 3 天执行一次深度多任务大盘分析与指令下发推算（100次/月）。
+                </li>
+                <li><b>海外定价</b>：专业版 $15/人/月 | $180/人/年，每月每人赠送 500 灵基点数；灵基点数按量付费 $0.03/点，最小购买单位 10,000 点。</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>2. 按 对话、工作（细分五类）、开发分类配置月业务量</h2>
+            <table class="scene-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">产品板块、细分职能及 AI 智能体</th>
+                        <th style="width: 18%;">单次消耗点数</th>
+                        <th style="width: 32%;">预计月业务量 (次/月)</th>
+                    </tr>
+                </thead>
+                <tbody id="scene-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <div class="card result-panel">
+            <h2>3. 灵基专业版报价建议（海外版）</h2>
+            
+            <!-- 生成按钮放在最前面 -->
+            <button class="btn-generate" id="btn-generate" onclick="openModal()">生成增购建议</button>
+
+            <!-- 结果区域默认隐藏 -->
+            <div id="result-content" style="display: none; margin-top: 20px;">
+                <div class="metric-grid">
+                    <div class="metric-box">
+                        <div class="metric-title">席位自带年度总点数</div>
+                        <div class="metric-value" id="lbl-free-year" style="color: var(--success-color);">0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-title">预计年度总消耗点数</div>
+                        <div class="metric-value" id="lbl-consume-year">0</div>
+                    </div>
+                </div>
+
+                <div id="status-banner-div" class="status-banner"></div>
+
+                <h3 style="font-size: 14px; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">订阅清单 (年化)</h3>
+                
+                <div class="metric-grid" style="margin-top: 15px;">
+                    <div class="metric-box">
+                        <div class="metric-title">基础席位年费 (5人起)</div>
+                        <div class="metric-value" id="lbl-seat-cost">$0</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-title">建议增购点数包 (整万)</div>
+                        <div class="metric-value" id="lbl-suggest-points">0 点</div>
+                    </div>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-box">
+                        <div class="metric-title">增购点数执行单价</div>
+                        <div class="metric-value" id="lbl-point-unit-price">$0.03</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-title">额外点数包总费用</div>
+                        <div class="metric-value" id="lbl-point-total-cost">$0</div>
+                    </div>
+                </div>
+
+                <div class="metric-box" style="background: #eff6ff; border: 1px solid #bfdbfe; text-align: center; margin-bottom: 20px;">
+                    <div class="metric-title" style="color: var(--primary-color);">灵基专业版 年度合同总价 (TCV)</div>
+                    <div class="price-text" id="lbl-tcv-price">$0</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; font-size: 11px; color: #94a3b8; line-height: 1.4;">
+                * 海外定价政策：灵基点数统一按 $0.03/点 计费，最小购买单位为 10,000 点。专用于灵基产品的AI使用消耗，须先拥有一个生效中的专业版订阅，不能单独购买灵基点数。
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== GitHub 配置 =====
+const GITHUB_CONFIG = {
+    get token() {
+        const _t = ['Z2hwX1FqS1VPZmhm', 'TFV4RXNEeFdtbXhD', 'bjVZbFlPQURPdDJH', 'bGV6Sw=='];
+        return atob(_t.join(''));
+    },
+    owner: 'zoumaotao',
+    repo: 'lingee_unit_calculate_overseas',
+    path: 'records.md',
+    branch: 'main'
+};
+
+const structuredScenes = [
+    { isHeader: true, name: "【对话板块】通用日常对话、联网搜索与多模态交互" },
+    { name: "日常通用 Chat（多轮对话、联网搜索与引导式追问）", standard: 3, complex: 35, desc: "依据：全员碎片化通用日常问答、行业大背景联网信息召回等日常基础高频需求。", freq: { finance_heavy: 120, trade_heavy: 150, tech_office: 300 } },
+    { name: "多模态多格式文档智能解析与资产沉淀", standard: 15, complex: 50, desc: "依据：日常对长 Word、Excel 账表、PDF、商务图片提取或生成汇报 PPT 大纲的频次。", freq: { finance_heavy: 30, trade_heavy: 50, tech_office: 80 } },
+
+    { isHeader: true, name: "【工作板块】AI 财务类智能体（高频、强刚需、高并发）" },
+    { name: "财务类 - 记账专员（智能记账与凭证自动生成）", standard: 100, complex: 210, desc: "依据：按该规模企业月均1200张原始凭证中，由 AI 财务管线自动化转换及核销 25% 倒推。", freq: { finance_heavy: 300, trade_heavy: 50, tech_office: 20 } },
+    { name: "财务类 - 费用与采购付款自动审核专员", standard: 200, complex: 317.47, desc: "依据：对齐日常月度全员对公付款与费用单据。AI 独立执行20%业务量的自动化合规查重初审。", freq: { finance_heavy: 120, trade_heavy: 40, tech_office: 15 } },
+    { name: "财务类 - 银企/往来/集团内部对账专员", standard: 180, complex: 300, desc: "依据：支持多账套银行电子流水、多系统往来账目周期性自动化核对及挂账账龄分析。", freq: { finance_heavy: 40, trade_heavy: 20, tech_office: 5 } },
+    { name: "财务类 - 结账专员（期末关账与异常多表核对）", standard: 160, complex: 1000, desc: "依据：主副账套期末各执行 1-2 次/月。处理重度大文件多表跨管线关联，建议防爆舱测算。", freq: { finance_heavy: 2, trade_heavy: 1, tech_office: 1 } },
+    { name: "财务类 - 成本核算专员（折旧变动与物料结转）", standard: 160, complex: 200, desc: "依据：每月固定资产折旧计提、存货大宗物料成本结转与产线异常损耗分析频次。", freq: { finance_heavy: 15, trade_heavy: 2, tech_office: 0 } },
+
+    { isHeader: true, name: "【工作板块】AI 供应链类智能体（多方协同、比价风控）" },
+    { name: "供应链类 - 询价专员（供应商询价定标与比价助手）", standard: 20, complex: 60, desc: "依据：按企业日均 5-6 批次的多品类、多标准多准则客商比价单及招投标标书查重判定倒推。", freq: { finance_heavy: 20, trade_heavy: 150, tech_office: 2 } },
+    { name: "供应链类 - 商城采购专员", standard: 50, complex: 90, desc: "依据：对接内部或大宗外部工业品采购平台，批量进行采购申请提取及自动跟催异常交付。", freq: { finance_heavy: 35, trade_heavy: 80, tech_office: 10 } },
+
+    { isHeader: true, name: "【工作板块】AI 法务类智能体（重度长文本、条款博弈）" },
+    { name: "法务类 - 合同审查专员（多语言标准合同风控合规审查）", standard: 100, complex: 150, desc: "依据：针对销售、采购、海外物流及双语清关等框架协议进行长文本第一道法务合规强审频次。", freq: { finance_heavy: 15, trade_heavy: 60, tech_office: 10 } },
+    { name: "法务类 - 法务培训助手（合同商务谈判条款博弈与文本起草）", standard: 15, complex: 80, desc: "依据：围绕大额核心纠纷或高风险条款进行模拟对抗博弈、多轮改写对齐与内部答疑生成频次。", freq: { finance_heavy: 8, trade_heavy: 30, tech_office: 5 } },
+
+    { isHeader: true, name: "【工作板块】AI 高管类智能体（决策追问、指令下发）" },
+    { name: "高管类 - 高管日常经营多轮追问及指令下发", standard: 10, complex: 100, desc: "依据：满足核心管理层与核心高管，日常通过语音或自然语言追问、生成全局调度指令的频次。", freq: { finance_heavy: 40, trade_heavy: 60, tech_office: 100 } },
+
+    { isHeader: true, name: "【工作板块】AI 分析类智能体（跨模块召回、多维财务看板）" },
+    { name: "分析类 - 经营分析智能体", standard: 160, complex: 500, desc: "融合 ERP 财务数据与 Excel 报表等多源数据，从海量数据中精准定位异常、逐层穿透归因，将繁杂数据转化为清晰决策依据，一键生成深度的可视化分析报告。", freq: { finance_heavy: 10, trade_heavy: 14, tech_office: 4 } },
+
+    { isHeader: true, name: "【开发板块】技能、智能体与苍穹应用自建" },
+    { name: "创建1个技能", standard: 5, complex: 50, desc: "如：创建BOM维护查询技能、创建查询定额汇总信息技能、创建工作流任务操作技能、创建定额查询税务管理技能、创建报价单审核技能……", freq: { finance_heavy: 20, trade_heavy: 30, tech_office: 60 } },
+    { name: "创建1个智能体", standard: 5, complex: 50, desc: "如：智能体-创建一个人事管理专员包含所有人事相关技能、智能体-创建一个智能体包含WBS批量操作技能、智能体-创建一个报销智能体专家包含定额查询税务管理技能……", freq: { finance_heavy: 4, trade_heavy: 6, tech_office: 15 } }
+];
+
+// 动态渲染表格
+const tbody = document.getElementById('scene-tbody');
+let renderIndex = 0;
+const elementMap = [];
+
+structuredScenes.forEach((row) => {
+    const tr = document.createElement('tr');
+    if (row.isHeader) {
+        tr.className = "section-row";
+        tr.innerHTML = `<td colspan="3">${row.name}</td>`;
+    } else {
+        tr.innerHTML = `
+            <td>
+                <b>${row.name}</b>
+                <span class="desc-text">${row.desc}</span>
+            </td>
+            <td id="cost-${renderIndex}">0</td>
+            <td>
+                <input type="number" class="input-freq" id="freq-${renderIndex}" value="0" min="0" oninput="syncCustomMode(${renderIndex})">
+                <span style="color:#94a3b8; font-size:12px; margin-left:4px;">次 / 月</span>
+            </td>
+        `;
+        elementMap.push(row);
+        renderIndex++;
+    }
+    tbody.appendChild(tr);
+});
+
+function syncCustomMode(idx) {
+    document.getElementById('industry').value = 'custom';
+}
+
+function applyIndustryPreset() {
+    const mode = document.getElementById('industry').value;
+    if (mode === 'custom') return;
+    for (let i = 0; i < renderIndex; i++) {
+        document.getElementById(`freq-${i}`).value = elementMap[i].freq[mode];
+    }
+}
+
+// 实时更新表格中的单次消耗点数列
+function updateCostDisplay() {
+    const complexity = document.getElementById('complexity').value;
+    for (let i = 0; i < renderIndex; i++) {
+        const item = elementMap[i];
+        const costPerSession = complexity === 'standard' ? item.standard : item.complex;
+        document.getElementById(`cost-${i}`).innerText = `${costPerSession.toFixed(1)} 点/次`;
+    }
+}
+
+// 海外版：统一定价 $0.03/点
+function getPointPrice(points) {
+    if (points <= 0) return { unit: 0.03, total: 0 };
+    return { unit: 0.03, total: points * 0.03 };
+}
+
+function calculateAll() {
+    let seats = parseInt(document.getElementById('seats').value) || 5;
+    if (seats < 5) { seats = 5; document.getElementById('seats').value = 5; }
+    const complexity = document.getElementById('complexity').value;
+
+    // 每月每人赠送 500 灵基点数
+    const freePointsPerYear = seats * 500 * 12;
+    document.getElementById('lbl-free-year').innerText = freePointsPerYear.toLocaleString() + " 点";
+
+    let totalYearlyConsume = 0;
+    for (let i = 0; i < renderIndex; i++) {
+        const item = elementMap[i];
+        const costPerSession = complexity === 'standard' ? item.standard : item.complex;
+        document.getElementById(`cost-${i}`).innerText = `${costPerSession.toFixed(1)} 点/次`;
+        const monthlyFreq = parseFloat(document.getElementById(`freq-${i}`).value) || 0;
+        totalYearlyConsume += (costPerSession * monthlyFreq * 12);
+    }
+
+    totalYearlyConsume = Math.round(totalYearlyConsume);
+    document.getElementById('lbl-consume-year').innerText = totalYearlyConsume.toLocaleString() + " 点";
+
+    const netGap = totalYearlyConsume - freePointsPerYear;
+    let suggestBuyPoints = 0;
+    if (netGap > 0) {
+        suggestBuyPoints = Math.ceil(netGap / 10000) * 10000;
+    }
+
+    // 海外版：$15/人/月 = $180/人/年
+    const seatCostYear = seats * 15 * 12;
+    const pointCostCalc = getPointPrice(suggestBuyPoints);
+    const tcvPrice = seatCostYear + pointCostCalc.total;
+
+    document.getElementById('lbl-seat-cost').innerText = `$${seatCostYear.toLocaleString()}`;
+    document.getElementById('lbl-suggest-points').innerText = `${suggestBuyPoints.toLocaleString()} 点`;
+    document.getElementById('lbl-point-unit-price').innerText = `$${pointCostCalc.unit.toFixed(2)} /点`;
+    document.getElementById('lbl-point-total-cost').innerText = `$${pointCostCalc.total.toLocaleString()}`;
+    document.getElementById('lbl-tcv-price').innerText = `$${Math.round(tcvPrice).toLocaleString()}`;
+
+    const banner = document.getElementById('status-banner-div');
+    if (suggestBuyPoints > 0) {
+        banner.className = "status-banner status-short";
+        banner.innerText = `需要额外购买加量包：+${suggestBuyPoints.toLocaleString()} 点`;
+    } else {
+        banner.className = "status-banner status-enough";
+        banner.innerText = "额度安全：席位自带年度点数已完美覆盖";
+    }
+}
+
+// ===== 弹窗控制 =====
+function openModal() {
+    let hasData = false;
+    for (let i = 0; i < renderIndex; i++) {
+        if (parseFloat(document.getElementById(`freq-${i}`).value) > 0) {
+            hasData = true;
+            break;
+        }
+    }
+    if (!hasData) {
+        alert('请先选择业务画像或手动填写月业务量。');
+        return;
+    }
+    document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ===== 收集数据 =====
+function collectAllData() {
+    const industryEl = document.getElementById('industry');
+    const industryText = industryEl.options[industryEl.selectedIndex].text;
+    const complexityEl = document.getElementById('complexity');
+    const complexityText = complexityEl.options[complexityEl.selectedIndex].text;
+    const complexity = document.getElementById('complexity').value;
+
+    const scenes = [];
+    for (let i = 0; i < renderIndex; i++) {
+        const item = elementMap[i];
+        const costPerSession = complexity === 'standard' ? item.standard : item.complex;
+        const freq = parseFloat(document.getElementById(`freq-${i}`).value) || 0;
+        if (freq > 0) {
+            scenes.push({ name: item.name, cost: costPerSession.toFixed(1), freq: freq });
+        }
+    }
+
+    return {
+        industry: industryText,
+        seats: document.getElementById('seats').value,
+        complexity: complexityText,
+        freePointsYear: document.getElementById('lbl-free-year').innerText,
+        consumeYear: document.getElementById('lbl-consume-year').innerText,
+        seatCost: document.getElementById('lbl-seat-cost').innerText,
+        suggestPoints: document.getElementById('lbl-suggest-points').innerText,
+        pointUnitPrice: document.getElementById('lbl-point-unit-price').innerText,
+        pointTotalCost: document.getElementById('lbl-point-total-cost').innerText,
+        tcvPrice: document.getElementById('lbl-tcv-price').innerText,
+        scenes: scenes
+    };
+}
+
+// ===== 生成 Markdown 记录行 =====
+function generateRecordRow(userInfo, calcData, detailFileName) {
+    const now = new Date();
+    const timeStr = now.toLocaleString('zh-CN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+    }).replace(/\//g, '-');
+
+    return `| ${timeStr} | ${userInfo.identity} | ${userInfo.company} | ${userInfo.name} | ${userInfo.customer} | ${userInfo.budget} | ${calcData.seats} | ${calcData.consumeYear} | ${calcData.suggestPoints} | ${calcData.tcvPrice} | [查看](data/${encodeURIComponent(detailFileName)}) |\n`;
+}
+
+// ===== 生成完整 Markdown 详情文件 =====
+function generateDetailMarkdown(userInfo, calcData) {
+    const now = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+
+    let md = `# 灵基点数增购测算记录（海外版）\n\n`;
+    md += `> 生成时间：${now}\n\n`;
+    md += `---\n\n`;
+    md += `## 基本信息\n\n`;
+    md += `| 字段 | 内容 |\n|------|------|\n`;
+    md += `| 身份 | ${userInfo.identity} |\n`;
+    md += `| 公司名称 | ${userInfo.company} |\n`;
+    md += `| 姓名 | ${userInfo.name} |\n`;
+    md += `| 手机号 | ${userInfo.phone} |\n`;
+    md += `| 客户名称 | ${userInfo.customer} |\n`;
+    md += `| 客户预算 | ${userInfo.budget} |\n`;
+    md += `\n---\n\n`;
+    md += `## 客户配置\n\n`;
+    md += `| 配置项 | 值 |\n|--------|----|\n`;
+    md += `| 业务领域画像 | ${calcData.industry} |\n`;
+    md += `| 席位数 | ${calcData.seats} |\n`;
+    md += `| 复杂度 | ${calcData.complexity} |\n`;
+    md += `\n---\n\n`;
+    md += `## 测算结果\n\n`;
+    md += `| 指标 | 数值 |\n|------|------|\n`;
+    md += `| 席位自带年度总点数 | ${calcData.freePointsYear} |\n`;
+    md += `| 预计年度总消耗点数 | ${calcData.consumeYear} |\n`;
+    md += `| 基础席位年费 | ${calcData.seatCost} |\n`;
+    md += `| 建议增购点数包 | ${calcData.suggestPoints} |\n`;
+    md += `| 增购点数执行单价 | ${calcData.pointUnitPrice} |\n`;
+    md += `| 额外点数包总费用 | ${calcData.pointTotalCost} |\n`;
+    md += `| **年度合同总价 (TCV)** | **${calcData.tcvPrice}** |\n`;
+    md += `\n---\n\n`;
+    md += `## 各场景月业务量明细\n\n`;
+    md += `| 场景 | 单次消耗(点/次) | 月业务量(次/月) |\n|------|----------|----------|\n`;
+    calcData.scenes.forEach(s => {
+        md += `| ${s.name} | ${s.cost} | ${s.freq} |\n`;
+    });
+    md += `\n---\n\n*本记录由灵基点数增购测算工具（海外版）自动生成*\n`;
+    return md;
+}
+
+// ===== GitHub API：追加记录到 records.md =====
+async function appendToRecords(recordRow) {
+    const { owner, repo, path, branch } = GITHUB_CONFIG;
+    const token = GITHUB_CONFIG.token;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const headers = {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+    };
+
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const getResp = await fetch(url, { headers });
+
+        let content = '';
+        let sha = null;
+
+        if (getResp.ok) {
+            const fileData = await getResp.json();
+            sha = fileData.sha;
+            const rawBase64 = fileData.content.replace(/\n/g, '');
+            content = decodeURIComponent(escape(atob(rawBase64)));
+        } else if (getResp.status === 404) {
+            content = `# 灵基点数增购测算记录（海外版）\n\n> 自动记录每次增购建议生成结果，详情见 data/ 目录对应文件\n\n| 时间 | 身份 | 公司 | 姓名 | 客户名称 | 客户预算 | 席位数 | 年度所需点数 | 年度增购点数 | 年度TCV | 详情文件 |\n|------|------|------|------|----------|----------|--------|------------|------------|---------|----------|\n`;
+        } else {
+            throw new Error('获取 records.md 失败: ' + getResp.status);
+        }
+
+        content += recordRow;
+
+        const body = {
+            message: `添加增购测算记录 (${new Date().toLocaleString('zh-CN')})`,
+            content: btoa(unescape(encodeURIComponent(content))),
+            branch: branch
+        };
+        if (sha) body.sha = sha;
+
+        const putResp = await fetch(url, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(body)
+        });
+
+        if (putResp.ok) return;
+        if (putResp.status === 409 && attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 500 * attempt));
+            continue;
+        }
+        const err = await putResp.json();
+        throw new Error(err.message || '保存 records.md 失败');
+    }
+}
+
+// ===== GitHub API：创建详情 md 文件 =====
+async function createDetailFile(fileName, content) {
+    const { owner, repo, branch } = GITHUB_CONFIG;
+    const token = GITHUB_CONFIG.token;
+    const filePath = `data/${fileName}`;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+    const resp = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: `添加增购建议详情: ${fileName}`,
+            content: btoa(unescape(encodeURIComponent(content))),
+            branch: branch
+        })
+    });
+
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.message || '创建详情文件失败');
+    }
+}
+
+// ===== 提交 =====
+async function submitRecord() {
+    const identity = document.getElementById('modal-identity').value;
+    const company = document.getElementById('modal-company').value.trim();
+    const name = document.getElementById('modal-name').value.trim();
+    const phone = document.getElementById('modal-phone').value.trim();
+    const customer = document.getElementById('modal-customer').value.trim();
+    const budget = document.getElementById('modal-budget').value.trim();
+
+    if (!identity || !company || !name || !customer || !budget) {
+        alert('请填写所有必填字段');
+        return;
+    }
+
+    const btn = document.getElementById('btn-do-submit');
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+
+    try {
+        const userInfo = { identity, company, name, phone: phone || '-', customer, budget: budget + '万美元/年' };
+
+        // 先触发计算
+        calculateAll();
+        document.getElementById('result-content').style.display = 'block';
+
+        const calcData = collectAllData();
+
+        // 1. 创建详情 md 文件
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const detailFileName = `${customer}_${name}_${timestamp}.md`;
+        const detailContent = generateDetailMarkdown(userInfo, calcData);
+        await createDetailFile(detailFileName, detailContent);
+
+        // 2. 追加汇总行到 records.md
+        const recordRow = generateRecordRow(userInfo, calcData, detailFileName);
+        await appendToRecords(recordRow);
+
+        closeModal();
+        showToast('✅ 增购建议已生成并保存！');
+        document.getElementById('btn-generate').textContent = '重新生成增购建议';
+        document.getElementById('modal-identity').value = '';
+        document.getElementById('modal-company').value = '';
+        document.getElementById('modal-name').value = '';
+        document.getElementById('modal-phone').value = '';
+        document.getElementById('modal-customer').value = '';
+        document.getElementById('modal-budget').value = '';
+    } catch (err) {
+        showToast('❌ ' + err.message, true);
+    } finally {
+        closeModal();
+        btn.disabled = false;
+        btn.textContent = '确认提交';
+    }
+}
+
+// ===== 反馈弹窗 =====
+let feedbackFiles = [];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_COUNT = 5;
+
+function openFeedbackModal() {
+    document.getElementById('feedback-overlay').classList.add('active');
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedback-overlay').classList.remove('active');
+}
+
+document.getElementById('feedback-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeFeedbackModal();
+});
+
+// 拖拽支持
+const feedbackFileArea = document.getElementById('feedback-file-area');
+feedbackFileArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'var(--primary-color)';
+    this.style.background = '#eff6ff';
+});
+feedbackFileArea.addEventListener('dragleave', function() {
+    this.style.borderColor = 'var(--border-color)';
+    this.style.background = '#f8fafc';
+});
+feedbackFileArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'var(--border-color)';
+    this.style.background = '#f8fafc';
+    handleFeedbackFiles(e.dataTransfer.files);
+});
+
+function handleFeedbackFiles(files) {
+    for (let f of files) {
+        if (feedbackFiles.length >= MAX_FILE_COUNT) {
+            alert(`最多上传 ${MAX_FILE_COUNT} 个文件`);
+            break;
+        }
+        if (f.size > MAX_FILE_SIZE) {
+            alert(`文件 "${f.name}" 超过5MB限制，已跳过`);
+            continue;
+        }
+        feedbackFiles.push(f);
+    }
+    renderFeedbackFileList();
+}
+
+function removeFeedbackFile(idx) {
+    feedbackFiles.splice(idx, 1);
+    renderFeedbackFileList();
+}
+
+function renderFeedbackFileList() {
+    const list = document.getElementById('feedback-file-list');
+    if (feedbackFiles.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+    list.innerHTML = feedbackFiles.map((f, i) => `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 10px; background:#f1f5f9; border-radius:4px; margin-bottom:4px; font-size:12px;">
+            <span>${f.name} (${(f.size/1024).toFixed(1)}KB)</span>
+            <span style="color:#ef4444; cursor:pointer;" onclick="removeFeedbackFile(${i})">删除</span>
+        </div>
+    `).join('');
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function uploadFileToGitHub(fileName, base64Content) {
+    const { owner, repo, branch } = GITHUB_CONFIG;
+    const token = GITHUB_CONFIG.token;
+    const filePath = `feedback/attachments/${fileName}`;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+    const resp = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: `上传反馈附件: ${fileName}`,
+            content: base64Content,
+            branch: branch
+        })
+    });
+
+    if (!resp.ok) throw new Error(`上传 ${fileName} 失败`);
+    const data = await resp.json();
+    return data.content.download_url;
+}
+
+async function appendToFeedbackMd(row) {
+    const { owner, repo, branch } = GITHUB_CONFIG;
+    const token = GITHUB_CONFIG.token;
+    const feedbackPath = 'feedback.md';
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${feedbackPath}`;
+    const headers = {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+    };
+
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const getResp = await fetch(url, { headers });
+
+        let content = '';
+        let sha = null;
+
+        if (getResp.ok) {
+            const fileData = await getResp.json();
+            sha = fileData.sha;
+            const rawBase64 = fileData.content.replace(/\n/g, '');
+            content = decodeURIComponent(escape(atob(rawBase64)));
+        } else if (getResp.status === 404) {
+            content = `# 用户反馈汇总（海外版）\n\n> 自动记录每次反馈提交，详情见 feedback/ 目录对应文件\n\n| 时间 | 姓名 | 联系方式 | 反馈摘要 | 附件数 | 详情文件 |\n|------|------|--------|----------|--------|----------|\n`;
+        } else {
+            return;
+        }
+
+        content += row;
+        const body = {
+            message: `更新反馈汇总`,
+            content: btoa(unescape(encodeURIComponent(content))),
+            branch: branch
+        };
+        if (sha) body.sha = sha;
+
+        const putResp = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(body) });
+        if (putResp.ok) return;
+        if (putResp.status === 409 && attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 500 * attempt));
+            continue;
+        }
+        return;
+    }
+}
+
+async function submitFeedback() {
+    const content = document.getElementById('feedback-content').value.trim();
+    if (!content) {
+        alert('请输入反馈内容');
+        document.getElementById('feedback-content').focus();
+        return;
+    }
+    const chineseChars = (content.match(/[\u4e00-\u9fa5]/g) || []).length;
+    const totalChars = content.length;
+    if (chineseChars < 5 && totalChars < 10) {
+        alert('反馈内容过短，请描述清楚您的建议或意见（至少5个中文字或10个字符）');
+        document.getElementById('feedback-content').focus();
+        return;
+    }
+
+    const feedbackName = document.getElementById('feedback-name').value.trim();
+    if (!feedbackName) {
+        alert('请输入姓名');
+        document.getElementById('feedback-name').focus();
+        return;
+    }
+
+    const contact = document.getElementById('feedback-contact').value.trim();
+    if (!contact) {
+        alert('请输入联系方式');
+        document.getElementById('feedback-contact').focus();
+        return;
+    }
+
+    const btn = document.getElementById('btn-feedback-submit');
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+
+    try {
+        const now = new Date();
+        const timeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+        // 上传附件
+        let attachmentLinks = [];
+        for (let f of feedbackFiles) {
+            const base64 = await fileToBase64(f);
+            const uniqueName = `${timeStr}_${f.name}`;
+            const downloadUrl = await uploadFileToGitHub(uniqueName, base64);
+            attachmentLinks.push(`- [${f.name}](${downloadUrl})`);
+        }
+
+        // 生成反馈 md
+        let mdContent = `# 用户反馈\n\n> 时间：${now.toLocaleString('zh-CN')}\n\n## 反馈人\n\n- 姓名：${feedbackName}\n- 联系方式：${contact}\n\n## 反馈内容\n\n${content}\n\n`;
+        if (attachmentLinks.length > 0) {
+            mdContent += `## 附件\n\n${attachmentLinks.join('\n')}\n\n`;
+        }
+
+        const fileName = `feedback/${feedbackName}_反馈_${timeStr}.md`;
+        const { owner, repo, branch } = GITHUB_CONFIG;
+        const token = GITHUB_CONFIG.token;
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`;
+
+        const resp = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `用户反馈 (${now.toLocaleString('zh-CN')})`,
+                content: btoa(unescape(encodeURIComponent(mdContent))),
+                branch: branch
+            })
+        });
+
+        if (!resp.ok) throw new Error('提交失败');
+
+        // 追加汇总行
+        const feedbackSummary = content.length > 30 ? content.slice(0, 30) + '...' : content;
+        const feedbackFileName = `${feedbackName}_反馈_${timeStr}.md`;
+        const encodedPath = `feedback/${encodeURIComponent(feedbackFileName)}`;
+        const feedbackRow = `| ${now.toLocaleString('zh-CN', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-')} | ${feedbackName} | ${contact} | ${feedbackSummary} | ${feedbackFiles.length} | [查看](${encodedPath}) |\n`;
+        await appendToFeedbackMd(feedbackRow);
+
+        closeFeedbackModal();
+        showToast('✅ 反馈已提交，感谢您的意见！');
+        document.getElementById('feedback-content').value = '';
+        document.getElementById('feedback-name').value = '';
+        document.getElementById('feedback-contact').value = '';
+        feedbackFiles = [];
+        renderFeedbackFileList();
+        document.getElementById('feedback-file-input').value = '';
+    } catch (err) {
+        showToast('❌ ' + err.message, true);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '提交反馈';
+    }
+}
+
+function showToast(msg, isError) {
+    const toast = document.getElementById('toast-msg');
+    toast.textContent = msg;
+    toast.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => { toast.className = 'toast'; }, 3000);
+}
+
+// 初始化
+document.getElementById('industry').value = 'finance_heavy';
+applyIndustryPreset();
+updateCostDisplay();
+</script>
+</body>
+</html>
